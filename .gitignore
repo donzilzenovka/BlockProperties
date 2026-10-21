@@ -5,6 +5,11 @@ ehthumbs.db
 # Folder config file
 Desktop.ini
 
+# Gradle / ForgeGradle build output
+.gradle/
+build/
+run/
+
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 

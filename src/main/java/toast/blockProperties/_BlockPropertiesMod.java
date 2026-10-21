@@ -26,7 +26,7 @@ public class _BlockPropertiesMod {
     // This mod's id.
     public static final String MODID = "BlockProperties";
     // This mod's version.
-    public static final String VERSION = "0.1.4";
+    public static final String VERSION = "0.1.5-experimental";
 
     // If true, this mod starts up in debug mode.
     public static final boolean debug = false;

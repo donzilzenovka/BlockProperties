@@ -1,5 +1,6 @@
 0.1.5
     - Fixed auto-generated folders not having special characters removed.
+    - Added experimental metadata-specific brightness through "stats_by_meta".
 0.1.4
     - Added "Info Wand" (get it using /bpinfo <player>) - turns in-game (tile)entity nbt data to an external nbt function.
     - New nbt function - "delete".

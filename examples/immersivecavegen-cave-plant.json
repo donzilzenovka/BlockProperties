@@ -1,0 +1,13 @@
+{
+  "_name": "immersivecavegen:cavePlant",
+  "stats_by_meta": [
+    {
+      "_meta": "0-1",
+      "brightness": 0
+    },
+    {
+      "_meta": "2-7",
+      "brightness": 7
+    }
+  ]
+}

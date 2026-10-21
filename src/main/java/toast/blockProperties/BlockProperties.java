@@ -35,6 +35,7 @@ public class BlockProperties implements IProperty {
     // Unloads all properties.
     public static void unload() {
         BlockProperties.PROPERTIES_MAP.clear();
+        MetadataLightRegistry.clear();
     }
 
     // Turns a string of info into data. Crashes the game if something goes wrong.
@@ -51,18 +52,21 @@ public class BlockProperties implements IProperty {
             throw new BlockPropertyException("Duplicate block file! (id: " + Block.blockRegistry.getNameForObject(block) + ")", path);
 
         JsonObject statsObj = node.getAsJsonObject("stats");
+        JsonArray statsByMetaNodes = node.getAsJsonArray("stats_by_meta");
         JsonArray breakSpeedNodes = node.getAsJsonArray("break_speed");
         JsonArray dropsNodes = node.getAsJsonArray("drops");
         JsonArray harvestNodes = node.getAsJsonArray("harvest");
         JsonArray xpNodes = node.getAsJsonArray("xp");
 
-		BlockProperties.PROPERTIES_MAP.put(block, new BlockProperties(path, node, block, statsObj, breakSpeedNodes, dropsNodes, harvestNodes, xpNodes));
+		BlockProperties.PROPERTIES_MAP.put(block, new BlockProperties(path, node, block, statsObj, statsByMetaNodes, breakSpeedNodes, dropsNodes, harvestNodes, xpNodes));
     }
 
     // The block id used for this category.
     private final Block theBlock;
     // Array of altered block stats.
     private final BlockStats stats;
+    // Metadata-specific stats. Brightness is the first supported override.
+    private final MetadataBlockStats statsByMeta;
     // Array of harvest check data.
     private final IProperty harvest;
     // Array of break speed modifications.
@@ -72,10 +76,11 @@ public class BlockProperties implements IProperty {
     // Array of added drop contents.
     private final IProperty drops;
 
-    private BlockProperties(String path, JsonObject root, Block block, JsonObject statsObj, JsonArray breakSpeedNodes, JsonArray dropsNodes, JsonArray harvestNodes, JsonArray xpNodes) {
+    private BlockProperties(String path, JsonObject root, Block block, JsonObject statsObj, JsonArray statsByMetaNodes, JsonArray breakSpeedNodes, JsonArray dropsNodes, JsonArray harvestNodes, JsonArray xpNodes) {
         FileHelper.verify(root, path, this);
         this.theBlock = block;
         this.stats = statsObj == null ? null : new BlockStats(path + "\\stats", root, statsObj);
+        this.statsByMeta = statsByMetaNodes == null ? null : new MetadataBlockStats(path + "\\stats_by_meta", statsByMetaNodes);
         this.breakSpeed = breakSpeedNodes == null ? null : new BreakSpeed(path + "\\break_speed", root, breakSpeedNodes);
         this.drops = dropsNodes == null ? null : new BlockDrops(path + "\\drops", root, dropsNodes);
         this.harvest = harvestNodes == null ? null : new BlockHarvest(path + "\\harvest", root, harvestNodes);
@@ -96,13 +101,16 @@ public class BlockProperties implements IProperty {
     // Returns an array of optional field names.
     @Override
     public String[] getOptionalFields() {
-        return new String[] { "break_speed", "drops", "harvest", "stats", "xp" };
+        return new String[] { "break_speed", "drops", "harvest", "stats", "stats_by_meta", "xp" };
     }
 
     // Initializes the block's stats.
     public void init(Block block) {
         if (this.stats != null) {
             this.stats.init(block);
+        }
+        if (this.statsByMeta != null) {
+            this.statsByMeta.init(block);
         }
     }
 
