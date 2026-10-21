@@ -40,7 +40,7 @@ public final class MetadataLightTransformer implements IClassTransformer {
                     patched[1] = true;
                     return intOverride(parent, blockName, desc, "getLightOpacity");
                 }
-                if (("getBlockHardness".equals(name) || "func_149712_f".equals(name)) && isWorldFloatDescriptor(desc)) {
+                if (("getBlockHardness".equals(name) || "func_149712_f".equals(name) || "f".equals(name)) && isWorldFloatDescriptor(desc)) {
                     patched[2] = true;
                     return floatOverride(parent, blockName, desc, "getBlockHardness", 1, 2, 3, 4);
                 }
@@ -125,21 +125,21 @@ public final class MetadataLightTransformer implements IClassTransformer {
                         if (opcode == Opcodes.GETFIELD && isBlockOwner(owner) && isSlipperiness(name, fieldDesc)) {
                             super.visitVarInsn(Opcodes.ALOAD, 0);
                             super.visitMethodInsn(Opcodes.INVOKESTATIC, HOOK_OWNER, "getSlipperinessAtFeet",
-                                    "(L" + owner + ";Lnet/minecraft/entity/Entity;)F", false);
+                                    "(L" + owner + ";L" + entityName(owner) + ";)F", false);
                             return;
                         }
                         if (opcode == Opcodes.GETFIELD && isBlockOwner(owner) && isStepSound(name, fieldDesc)) {
                             super.visitVarInsn(Opcodes.ALOAD, 0);
-                            if (ENTITY_CLASS.equals(transformedName) && isStepMethod(methodName, desc)) {
+                            if (ENTITY_CLASS.equals(transformedName) && isStepMethod(methodName, desc, owner)) {
                                 super.visitVarInsn(Opcodes.ILOAD, 1);
                                 super.visitVarInsn(Opcodes.ILOAD, 2);
                                 super.visitVarInsn(Opcodes.ILOAD, 3);
                                 super.visitMethodInsn(Opcodes.INVOKESTATIC, HOOK_OWNER, "getSoundType",
-                                        "(L" + owner + ";Lnet/minecraft/entity/Entity;III)" + fieldDesc, false);
+                                        "(L" + owner + ";L" + entityName(owner) + ";III)" + fieldDesc, false);
                             }
                             else {
                                 super.visitMethodInsn(Opcodes.INVOKESTATIC, HOOK_OWNER, "getSoundTypeAtFeet",
-                                        "(L" + owner + ";Lnet/minecraft/entity/Entity;)" + fieldDesc, false);
+                                        "(L" + owner + ";L" + entityName(owner) + ";)" + fieldDesc, false);
                             }
                             return;
                         }
@@ -159,19 +159,25 @@ public final class MetadataLightTransformer implements IClassTransformer {
     }
 
     private static boolean isBlockOwner(String owner) {
-        return "net/minecraft/block/Block".equals(owner);
+        return "net/minecraft/block/Block".equals(owner) || "aji".equals(owner);
     }
 
     private static boolean isSlipperiness(String name, String desc) {
-        return "F".equals(desc) && ("slipperiness".equals(name) || "field_149765_K".equals(name));
+        return "F".equals(desc) && ("slipperiness".equals(name) || "field_149765_K".equals(name) || "K".equals(name));
     }
 
     private static boolean isStepSound(String name, String desc) {
-        return desc.endsWith("Block$SoundType;") && ("stepSound".equals(name) || "field_149762_H".equals(name));
+        return (desc.endsWith("Block$SoundType;") || "Lajm;".equals(desc)) &&
+                ("stepSound".equals(name) || "field_149762_H".equals(name) || "H".equals(name));
     }
 
-    private static boolean isStepMethod(String name, String desc) {
-        return ("func_145780_a".equals(name) || "playStepSound".equals(name)) && desc.startsWith("(III");
+    private static boolean isStepMethod(String name, String desc, String blockOwner) {
+        return ("func_145780_a".equals(name) || "playStepSound".equals(name) || "a".equals(name)) &&
+                desc.equals("(IIIL" + blockOwner + ";)V");
+    }
+
+    private static String entityName(String blockOwner) {
+        return "aji".equals(blockOwner) ? "sa" : "net/minecraft/entity/Entity";
     }
 
     private static boolean isWorldIntDescriptor(String desc) {
