@@ -269,7 +269,7 @@ public class BlockStats {
     private static final HashMap<Block.SoundType, String> SOUND_TO_NAME_MAP = new HashMap<Block.SoundType, String>();
 
     // Returns the step sound for a given name.
-    private static Block.SoundType getSound(String path, String soundName) {
+    static Block.SoundType getSound(String path, String soundName) {
         path += "\\sound";
         if (soundName == null || soundName.length() == 0 || soundName.equalsIgnoreCase("<unknown>"))
             return null;

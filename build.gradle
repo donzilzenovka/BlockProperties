@@ -10,7 +10,7 @@ buildscript {
 
 apply plugin: "forge"
 
-version = "0.1.5-experimental"
+version = "0.1.6-unofficial"
 group = "toast.blockProperties"
 archivesBaseName = "BlockProperties"
 
